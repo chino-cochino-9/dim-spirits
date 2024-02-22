@@ -2,25 +2,47 @@ namespace SpriteKind {
     export const object = SpriteKind.create()
 }
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    slash = sprites.createProjectileFromSprite(img`
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . 8 . . . . . 
-        . . . . . . . . . 1 8 . . . . . 
-        . . . . . . . . 1 8 . . . . . . 
-        . . . . . . . . . 8 . . . . . . 
-        . . . . . . 8 8 8 . . . . . . . 
-        . . . . . 8 8 . . . . . . . . . 
-        . . . . . 8 . 1 . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        . . . . . . . . . . . . . . . . 
-        `, you, Render.getAttribute(Render.attribute.dirX) * 50, Render.getAttribute(Render.attribute.dirY) * 50)
-    sprites.destroy(slash, effects.spray, 500)
+    if (slash.vx == 0 || slash.vx == 0) {
+        slash = sprites.createProjectileFromSprite(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . 8 . . . . . 
+            . . . . . . . . . 1 8 . . . . . 
+            . . . . . . . . 1 8 . . . . . . 
+            . . . . . . . . . 8 . . . . . . 
+            . . . . . . 8 8 8 . . . . . . . 
+            . . . . . 8 8 . . . . . . . . . 
+            . . . . . 8 . 1 . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, you, Render.getAttribute(Render.attribute.dirX) * 200, Render.getAttribute(Render.attribute.dirY) * 200)
+        sprites.destroy(slash, effects.spray, 500)
+    } else {
+        slash = sprites.createProjectileFromSprite(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . 8 . . . . . 
+            . . . . . . . . . 1 8 . . . . . 
+            . . . . . . . . 1 8 . . . . . . 
+            . . . . . . . . . 8 . . . . . . 
+            . . . . . . 8 8 8 . . . . . . . 
+            . . . . . 8 8 . . . . . . . . . 
+            . . . . . 8 . 1 . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            `, you, Render.getAttribute(Render.attribute.dirX) * 50, Render.getAttribute(Render.attribute.dirY) * 50)
+        sprites.destroy(slash, effects.spray, 500)
+    }
 })
 function startup () {
     tiles.setCurrentTilemap(tilemap`level`)
