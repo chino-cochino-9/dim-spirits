@@ -1,6 +1,27 @@
 namespace SpriteKind {
     export const object = SpriteKind.create()
 }
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    slash = sprites.createProjectileFromSprite(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . 8 . . . . . 
+        . . . . . . . . . 1 8 . . . . . 
+        . . . . . . . . 1 8 . . . . . . 
+        . . . . . . . . . 8 . . . . . . 
+        . . . . . . 8 8 8 . . . . . . . 
+        . . . . . 8 8 . . . . . . . . . 
+        . . . . . 8 . 1 . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, you, Render.getAttribute(Render.attribute.dirX) * 50, Render.getAttribute(Render.attribute.dirY) * 50)
+    sprites.destroy(slash, effects.spray, 500)
+})
 function startup () {
     tiles.setCurrentTilemap(tilemap`level`)
     scene.setBackgroundImage(img`
@@ -125,13 +146,15 @@ function startup () {
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
         ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
         `)
-    you = sprites.create(assets.image`swordd`, SpriteKind.object)
-    you.setFlag(SpriteFlag.RelativeToCamera, true)
-    you.setImage(assets.image`swordd`)
-    you.setPosition(126, 89)
-    scaling.scaleByPixels(you, 20, ScaleDirection.Horizontally, ScaleAnchor.Middle)
-    scaling.scaleByPixels(you, 20, ScaleDirection.Vertically, ScaleAnchor.Middle)
-    you = Render.getRenderSpriteVariable()
+    sword = sprites.create(assets.image`swordd`, SpriteKind.object)
+    sword.setFlag(SpriteFlag.RelativeToCamera, true)
+    sword.setImage(assets.image`swordd`)
+    sword.setPosition(126, 89)
+    scaling.scaleByPixels(sword, 20, ScaleDirection.Horizontally, ScaleAnchor.Middle)
+    scaling.scaleByPixels(sword, 20, ScaleDirection.Vertically, ScaleAnchor.Middle)
 }
+let sword: Sprite = null
+let slash: Sprite = null
 let you: Sprite = null
+you = Render.getRenderSpriteVariable()
 startup()
