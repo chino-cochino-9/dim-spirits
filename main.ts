@@ -22,7 +22,7 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         `, you, Render.getAttribute(Render.attribute.dirX) * 100, Render.getAttribute(Render.attribute.dirY) * 100)
 })
 function startup () {
-    tiles.setCurrentTilemap(tilemap`level2`)
+    tiles.setCurrentTilemap(tilemap`level5`)
     scene.setBackgroundImage(img`
         bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
         bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
@@ -290,21 +290,21 @@ sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSp
     playbar.value += -5
     pause(500)
 })
+scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
+    sprites.destroy(sprite, effects.blizzard, 500)
+})
 function spawnen (enlist: Image[]) {
     encount = 0
     for (let index = 0; index < 5; index++) {
         enemies = sprites.create(enlist._pickRandom(), SpriteKind.Enemy)
-        tiles.placeOnRandomTile(enemies, sprites.dungeon.darkGroundSouthWest1)
+        tiles.placeOnRandomTile(enemies, sprites.dungeon.darkGroundSouthEast1)
         enemies.follow(you, 15)
         encount += 1
     }
 }
-scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
-    sprites.destroy(sprite, effects.blizzard, 500)
-})
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
-    sprites.destroy(sprite, effects.spray, 500)
-    sprites.destroy(otherSprite)
+    sprites.destroy(sprite, effects.coolRadial, 500)
+    sprites.destroy(otherSprite, effects.coolRadial, 500)
 })
 let enemies: Sprite = null
 let encount = 0
@@ -401,4 +401,4 @@ playbar = statusbars.create(100, 15, StatusBarKind.Health)
 playbar.value = 100
 playbar.setFlag(SpriteFlag.RelativeToCamera, true)
 playbar.setPosition(80, 110)
-tiles.placeOnTile(you, tiles.getTileLocation(10, 3))
+tiles.placeOnTile(you, tiles.getTileLocation(6, 3))
