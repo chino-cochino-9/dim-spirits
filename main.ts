@@ -1557,7 +1557,7 @@ function spawnen (enlist: Image[]) {
         tiles.placeOnRandomTile(enemies, sprites.dungeon.darkGroundCenter)
         encount += 1
         if (!(enemies.image.equals(assets.image`myImage`))) {
-            enemies.follow(you, randint(10, 100))
+            enemies.follow(you, randint(10, 50))
         }
     }
 }
@@ -1565,6 +1565,10 @@ sprites.onOverlap(SpriteKind.idunno, SpriteKind.Player, function (sprite, otherS
     music.play(music.createSoundEffect(WaveShape.Noise, 5000, 2124, 139, 0, 500, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
     playbar.value += -10
     sprites.destroy(sprite)
+})
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.idunno, function (sprite, otherSprite) {
+    sprites.destroy(sprite, effects.starField, 500)
+    sprites.destroy(otherSprite, effects.starField, 500)
 })
 sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
     playbar.value += 2
@@ -1574,15 +1578,16 @@ sprites.onCreated(SpriteKind.idunno, function (sprite) {
         sprites.destroy(sprite)
     })
 })
-sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
-    playbar.value += -5
-    music.play(music.createSoundEffect(WaveShape.Noise, 5000, 776, 139, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
-    pause(500)
-})
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     music.play(music.createSoundEffect(WaveShape.Noise, 3551, 5000, 139, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Logarithmic), music.PlaybackMode.UntilDone)
     sprites.destroy(sprite, effects.coolRadial, 500)
     sprites.destroy(otherSprite, effects.coolRadial, 500)
+    encount += -1
+})
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
+    playbar.value += -5
+    music.play(music.createSoundEffect(WaveShape.Noise, 5000, 776, 139, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
+    pause(500)
 })
 let iduuno: Sprite = null
 let enemies: Sprite = null
@@ -1594,50 +1599,8 @@ let you: Sprite = null
 you = Render.getRenderSpriteVariable()
 startup()
 let enlist = [
-img`
-    ........................
-    ........................
-    ........................
-    ........................
-    ..........ffff..........
-    ........ff1111ff........
-    .......fb111111bf.......
-    .......f11111111f.......
-    ......fd11111111df......
-    ......fd11111111df......
-    ......fddd1111dddf......
-    ......fbdbfddfbdbf......
-    ......fcdcf11fcdcf......
-    .......fb111111bf.......
-    ......fffcdb1bdffff.....
-    ....fc111cbfbfc111cf....
-    ....f1b1b1ffff1b1b1f....
-    ....fbfbffffffbfbfbf....
-    .........ffffff.........
-    ...........fff..........
-    ........................
-    ........................
-    ........................
-    ........................
-    `,
-img`
-    . . f f f . . . . . . . . . . . 
-    f f f c c . . . . . . . . f f f 
-    f f c c . . c c . . . f c b b c 
-    f f c 3 c c 3 c c f f b b b c . 
-    f f b 3 b c 3 b c f b b c c c . 
-    . c b b b b b b c f b c b c c . 
-    . c b b b b b b c b b c b b c . 
-    c b 1 b b b 1 b b b c c c b c . 
-    c b b b b b b b b c c c c c . . 
-    f b c b b b c b b b b f c . . . 
-    f b 1 f f f 1 b b b b f c c . . 
-    . f b b b b b b b b c f . . . . 
-    . . f b b b b b b c f . . . . . 
-    . . . f f f f f f f . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    . . . . . . . . . . . . . . . . 
-    `,
+assets.image`myImage2`,
+assets.image`myImage1`,
 assets.image`myImage0`,
 assets.image`myImage`
 ]
@@ -1647,6 +1610,11 @@ playbar.value = 100
 playbar.setFlag(SpriteFlag.RelativeToCamera, true)
 playbar.setPosition(80, 110)
 tiles.placeOnTile(you, tiles.getTileLocation(6, 3))
+game.onUpdateInterval(500, function () {
+    if (encount == 0) {
+        spawnen(enlist)
+    }
+})
 game.onUpdateInterval(5000, function () {
     for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
         if (value.image.equals(assets.image`myImage`)) {
@@ -1672,7 +1640,4 @@ game.onUpdateInterval(5000, function () {
             iduuno.follow(you, 20)
         }
     }
-})
-game.onUpdateInterval(500, function () {
-	
 })
