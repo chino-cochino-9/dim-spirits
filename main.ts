@@ -1610,11 +1610,6 @@ playbar.value = 100
 playbar.setFlag(SpriteFlag.RelativeToCamera, true)
 playbar.setPosition(80, 110)
 tiles.placeOnTile(you, tiles.getTileLocation(6, 3))
-game.onUpdateInterval(500, function () {
-    if (encount == 0) {
-        spawnen(enlist)
-    }
-})
 game.onUpdateInterval(5000, function () {
     for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
         if (value.image.equals(assets.image`myImage`)) {
@@ -1639,5 +1634,10 @@ game.onUpdateInterval(5000, function () {
             iduuno.setPosition(value.x, value.y)
             iduuno.follow(you, 20)
         }
+    }
+})
+game.onUpdateInterval(500, function () {
+    if (encount == 0) {
+        spawnen(enlist)
     }
 })
