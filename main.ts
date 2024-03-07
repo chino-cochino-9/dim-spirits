@@ -667,7 +667,7 @@ function spawnen (enlist: Image[]) {
         if (!(enemies.image.equals(assets.image`myImage`))) {
             enemies.follow(you, randint(10, 50))
         } else {
-        	
+            alien2()
         }
         encount += 1
     }
