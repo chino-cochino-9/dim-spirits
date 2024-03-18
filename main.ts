@@ -6,23 +6,13 @@ namespace SpriteKind {
 namespace StatusBarKind {
     export const alienhealth = StatusBarKind.create()
 }
-sprites.onOverlap(SpriteKind.idunno, SpriteKind.Player, function (sprite, otherSprite) {
-    music.play(music.createSoundEffect(WaveShape.Noise, 5000, 2124, 139, 0, 500, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
-    playbar.value += -10
-    sprites.destroy(sprite)
+// the players projectile gets destroyed after 1 second
+sprites.onCreated(SpriteKind.Projectile, function (sprite) {
+    timer.after(1000, function () {
+        sprites.destroy(slash, effects.blizzard, 500)
+    })
 })
-function alien2 () {
-    enemies.setKind(SpriteKind.alien)
-    enbar = statusbars.create(1e-8, 1e-8, StatusBarKind.EnemyHealth)
-    enbar.value = 5
-    enbar.attachToSprite(enemies)
-    enemies.follow(you, 0)
-}
-sprites.onOverlap(SpriteKind.Projectile, SpriteKind.alien, function (sprite, otherSprite) {
-    statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1
-    music.play(music.createSoundEffect(WaveShape.Noise, 3551, 5000, 139, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Logarithmic), music.PlaybackMode.UntilDone)
-    sprites.destroy(sprite, effects.coolRadial, 500)
-})
+// sword gets animated and projectile shoots
 controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
     animation.runImageAnimation(
     sword,
@@ -505,15 +495,33 @@ controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
         . . . . . . . 6 6 9 6 . . . . . 
         `, you, Render.getAttribute(Render.attribute.dirX) * 100, Render.getAttribute(Render.attribute.dirY) * 100)
 })
-sprites.onCreated(SpriteKind.idunno, function (sprite) {
-    timer.after(5000, function () {
-        sprites.destroy(sprite)
-    })
+// allows the alien to do damage to the player if they overlap
+sprites.onOverlap(SpriteKind.Player, SpriteKind.alien, function (sprite, otherSprite) {
+    playbar.value += -5
+    music.play(music.createSoundEffect(WaveShape.Noise, 5000, 776, 139, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
+    pause(500)
 })
+// the alien function has a health bar so it can take more damage
+function alien2 () {
+    enemies.setKind(SpriteKind.alien)
+    enbar = statusbars.create(1e-8, 1e-8, StatusBarKind.EnemyHealth)
+    enbar.value = 5
+    enbar.attachToSprite(enemies)
+    enemies.follow(you, 0)
+}
+// projectile changes enemy health by 1
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.alien, function (sprite, otherSprite) {
+    statusbars.getStatusBarAttachedTo(StatusBarKind.EnemyHealth, otherSprite).value += -1
+    music.play(music.createSoundEffect(WaveShape.Noise, 3551, 5000, 139, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Logarithmic), music.PlaybackMode.UntilDone)
+    sprites.destroy(sprite, effects.coolRadial, 500)
+})
+// destroys enemy with 0 status
 statusbars.onZero(StatusBarKind.EnemyHealth, function (status) {
     sprites.destroy(status.spriteAttachedTo())
     encount += -1
 })
+// function loads a tile map and creates the sword, uses scaling extension and inspirations by carlton fade
+// https://makecode.com/_HFM4239CmPpa 
 function startup () {
     tiles.setCurrentTilemap(tilemap`level5`)
     scene.setBackgroundImage(img`
@@ -638,6 +646,7 @@ function startup () {
         dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
         dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd
         `)
+    round = 0
     sword = sprites.create(assets.image`great sword`, SpriteKind.object)
     sword.setScale(1.5, ScaleAnchor.Middle)
     sword.setFlag(SpriteFlag.RelativeToCamera, true)
@@ -646,55 +655,70 @@ function startup () {
     scaling.scaleByPixels(sword, 20, ScaleDirection.Horizontally, ScaleAnchor.Middle)
     scaling.scaleByPixels(sword, 20, ScaleDirection.Vertically, ScaleAnchor.Middle)
 }
+// starts over after dies
 statusbars.onZero(StatusBarKind.Health, function (status) {
     game.splash("YOU DIE", "TRY AGAIN?")
     game.reset()
 })
-sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
-    playbar.value += -5
-    music.play(music.createSoundEffect(WaveShape.Noise, 5000, 776, 139, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
-    pause(500)
+// after an enemy gets destroyed, players health regenerates
+sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
+    playbar.value += 2
 })
+// when projectile hits a wall it gets destroyed
+scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
+    sprites.destroy(sprite, effects.blizzard, 500)
+})
+// when the two projectiles overlap they both get destroyed
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.idunno, function (sprite, otherSprite) {
     sprites.destroy(sprite, effects.starField, 500)
     sprites.destroy(otherSprite, effects.starField, 500)
 })
+// function calls the list of enemies in start and has a special function that it calls for a specific enemy type
 function spawnen (enlist: Image[]) {
     encount = 0
     for (let index = 0; index < 5; index++) {
         enemies = sprites.create(enlist._pickRandom(), SpriteKind.Enemy)
-        tiles.placeOnRandomTile(enemies, sprites.dungeon.darkGroundCenter)
         if (!(enemies.image.equals(assets.image`myImage`))) {
             enemies.follow(you, randint(10, 50))
         } else {
             alien2()
         }
+        tiles.placeOnRandomTile(enemies, sprites.dungeon.darkGroundCenter)
         encount += 1
     }
 }
-scene.onHitWall(SpriteKind.Projectile, function (sprite, location) {
-    sprites.destroy(sprite, effects.blizzard, 500)
+sprites.onOverlap(SpriteKind.idunno, SpriteKind.Player, function (sprite, otherSprite) {
+    music.play(music.createSoundEffect(WaveShape.Noise, 5000, 2124, 139, 0, 500, SoundExpressionEffect.Tremolo, InterpolationCurve.Curve), music.PlaybackMode.UntilDone)
+    playbar.value += -10
+    sprites.destroy(sprite)
 })
-sprites.onCreated(SpriteKind.Projectile, function (sprite) {
-    timer.after(1000, function () {
-        sprites.destroy(slash, effects.blizzard, 500)
+// the aliens porjectiile destroys after 5 seconds
+sprites.onCreated(SpriteKind.idunno, function (sprite) {
+    timer.after(5000, function () {
+        sprites.destroy(sprite)
     })
 })
-sprites.onDestroyed(SpriteKind.Enemy, function (sprite) {
-    playbar.value += 2
+// this is how the character takes damage
+sprites.onOverlap(SpriteKind.Enemy, SpriteKind.Player, function (sprite, otherSprite) {
+    playbar.value += -5
+    music.play(music.createSoundEffect(WaveShape.Noise, 5000, 776, 139, 0, 500, SoundExpressionEffect.None, InterpolationCurve.Linear), music.PlaybackMode.UntilDone)
+    pause(500)
 })
+// when projectile overlaps enemy, enemy gets destroyed
 sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
     music.play(music.createSoundEffect(WaveShape.Noise, 3551, 5000, 139, 0, 500, SoundExpressionEffect.Vibrato, InterpolationCurve.Logarithmic), music.PlaybackMode.UntilDone)
     sprites.destroy(sprite, effects.coolRadial, 500)
     sprites.destroy(otherSprite)
     encount += -1
 })
+// sets the player as a different character with using 3d render extension and calls the start function and enemy list function. it also uses health bar extensions and creates a health bar
 let iduuno: Sprite = null
+let round = 0
 let encount = 0
-let slash: Sprite = null
-let sword: Sprite = null
 let enbar: StatusBarSprite = null
 let enemies: Sprite = null
+let sword: Sprite = null
+let slash: Sprite = null
 let playbar: StatusBarSprite = null
 let you: Sprite = null
 you = Render.getRenderSpriteVariable()
@@ -711,6 +735,12 @@ playbar.value = 100
 playbar.setFlag(SpriteFlag.RelativeToCamera, true)
 playbar.setPosition(80, 110)
 tiles.placeOnTile(you, tiles.getTileLocation(6, 3))
+game.onUpdate(function () {
+    if (encount == 0) {
+        spawnen(enlist)
+    }
+})
+// the aliens projectile spawns from the alien and follows the character
 game.onUpdateInterval(5000, function () {
     for (let value of sprites.allOfKind(SpriteKind.alien)) {
         if (value.image.equals(assets.image`myImage`)) {
@@ -735,10 +765,5 @@ game.onUpdateInterval(5000, function () {
             iduuno.setPosition(value.x, value.y)
             iduuno.follow(you, 20)
         }
-    }
-})
-game.onUpdateInterval(500, function () {
-    if (encount == 0) {
-        spawnen(enlist)
     }
 })
